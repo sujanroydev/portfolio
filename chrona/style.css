@@ -188,11 +188,6 @@ a {
   color: var(--text);
 }
 
-.version {
-  margin-top: 18px !important;
-  font-size: 13px !important;
-}
-
 .hero-preview {
   display: flex;
   justify-content: center;
