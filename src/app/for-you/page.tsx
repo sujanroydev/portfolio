@@ -1,180 +1,512 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface FloatingHeart {
   id: number;
   left: string;
   size: string;
-  duration: string;
-  delay: string;
+  duration: number;
+  delay: number;
   emoji: string;
   expiresAt: number;
 }
 
+const reasons = [
+  {
+    icon: "✨",
+    title: "Your beautiful smile",
+    description:
+      "You have a way of making an ordinary day feel a little brighter.",
+  },
+  {
+    icon: "🌸",
+    title: "The little things",
+    description: "I love all those little things that make you uniquely you.",
+  },
+  {
+    icon: "💗",
+    title: "The way you make me feel",
+    description: "Somehow, just thinking about you brings a smile to my face.",
+  },
+  {
+    icon: "🌙",
+    title: "Something different",
+    description:
+      "Being around you feels special in a way I cannot quite explain.",
+  },
+];
+
 export default function ForYouPage() {
   const [hearts, setHearts] = useState<FloatingHeart[]>([]);
   const [messageVisible, setMessageVisible] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const heartId = useRef(0);
   const storyRef = useRef<HTMLElement | null>(null);
   const messageRef = useRef<HTMLDivElement | null>(null);
 
-  function createHeart(delay = 0): FloatingHeart {
-    const duration = Math.random() * 5 + 6;
+  const createHeart = useCallback((delay = 0): FloatingHeart => {
+    const duration = Math.random() * 5 + 8;
+
     return {
       id: heartId.current++,
-      left: `${Math.random() * 100}vw`,
-      size: `${Math.random() * 25 + 15}px`,
-      duration: `${duration}s`,
-      delay: `${delay}ms`,
-      emoji: Math.random() > 0.5 ? "❤️" : "💗",
-      expiresAt: Date.now() + (duration + delay / 1000) * 1000,
+      left: `${Math.random() * 100}%`,
+      size: `${Math.random() * 17 + 12}px`,
+      duration,
+      delay,
+      emoji: Math.random() > 0.5 ? "♡" : "♥",
+      expiresAt: Date.now() + duration * 1000 + delay,
     };
-  }
+  }, []);
 
+  // Floating hearts
   useEffect(() => {
     const timer = window.setInterval(() => {
       const now = Date.now();
+
       setHearts((current) => [
-        ...current.filter((heart) => heart.expiresAt > now),
+        ...current.filter((heart) => heart.expiresAt > now).slice(-24),
         createHeart(),
       ]);
-    }, 700);
+    }, 1000);
+
     return () => window.clearInterval(timer);
+  }, [createHeart]);
+
+  // Scroll progress
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      setProgress(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0);
+    };
+
+    updateProgress();
+
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
   }, []);
 
+  // Scroll to revealed confession
   useEffect(() => {
     if (messageVisible) {
-      messageRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      const timer = window.setTimeout(() => {
+        messageRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 150);
+
+      return () => window.clearTimeout(timer);
     }
   }, [messageVisible]);
 
-  function revealMessage() {
+  const revealMessage = () => {
     setMessageVisible(true);
+
+    const now = Date.now();
+
     setHearts((current) => [
-      ...current.filter((heart) => heart.expiresAt > Date.now()),
-      ...Array.from({ length: 25 }, (_, index) => createHeart(index * 80)),
+      ...current.filter((heart) => heart.expiresAt > now).slice(-15),
+      ...Array.from({ length: 30 }, (_, index) => createHeart(index * 65)),
     ]);
-  }
+  };
+
+  const scrollToStory = () => {
+    storyRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,#ff7eb3,transparent_35%),radial-gradient(circle_at_bottom_right,#ff758c,transparent_40%),linear-gradient(135deg,#1a0b16,#3a1028)] font-[Arial,sans-serif] text-white">
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#160811] font-sans text-white selection:bg-[#f5a5bd] selection:text-[#260c19]">
+      {/* Animation styles */}
+      <style jsx global>{`
+        @keyframes float-up {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.65;
+          }
+          90% {
+            opacity: 0.35;
+          }
+          100% {
+            transform: translateY(-115vh) rotate(35deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes heartbeat {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          15% {
+            transform: scale(1.15);
+          }
+          30% {
+            transform: scale(1);
+          }
+          45% {
+            transform: scale(1.1);
+          }
+        }
+
+        @keyframes fade-up {
+          from {
+            opacity: 0;
+            transform: translateY(25px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes glow {
+          0%,
+          100% {
+            opacity: 0.35;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+
+        @keyframes reveal {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .float-heart {
+          animation-name: float-up;
+          animation-timing-function: linear;
+          animation-fill-mode: forwards;
+        }
+
+        .fade-up {
+          animation: fade-up 1s ease-out both;
+        }
+
+        .heart-beat {
+          animation: heartbeat 1.6s ease-in-out infinite;
+        }
+
+        .reveal {
+          animation: reveal 0.8s ease-out both;
+        }
+
+        .glass-card {
+          background: linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.105),
+            rgba(255, 255, 255, 0.035)
+          );
+          border: 1px solid rgba(255, 255, 255, 0.13);
+          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+        }
+
+        html {
+          scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      `}</style>
+
+      {/* Background */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#a51d53]/20 blur-[130px]" />
+        <div className="absolute -right-40 top-[35%] h-[450px] w-[450px] rounded-full bg-[#e45b91]/15 blur-[130px]" />
+        <div className="absolute -bottom-40 left-[20%] h-[450px] w-[450px] rounded-full bg-[#76204a]/20 blur-[130px]" />
+
         {hearts.map((heart) => (
           <span
-            className="absolute bottom-[-50px] animate-[floatUp_linear_forwards] opacity-70 motion-reduce:animate-none"
             key={heart.id}
+            className="float-heart absolute bottom-[-40px] select-none text-[#ff9fbd]"
             style={{
               left: heart.left,
               fontSize: heart.size,
-              animationDuration: heart.duration,
-              animationDelay: heart.delay,
+              animationDuration: `${heart.duration}s`,
+              animationDelay: `${heart.delay}ms`,
             }}
           >
             {heart.emoji}
           </span>
         ))}
       </div>
-      <main className="relative z-[1] mx-auto w-[min(900px,92%)] pb-[60px] pt-[30px]">
-        <section className="grid min-h-screen place-items-center py-10 text-center">
-          <div className="w-full max-w-[700px] rounded-[30px] border border-white/20 bg-white/[0.12] px-[30px] py-[50px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-[18px] max-[600px]:px-5 max-[600px]:py-10">
-            <div className="mb-[15px] text-base uppercase tracking-[2px] opacity-80">I made something for you</div>
-            <h1 className="mb-5 text-[clamp(2.5rem,8vw,5.5rem)]">Hey, <span className="text-[#ffd1df] [text-shadow:0_0_20px_rgba(255,170,200,0.8)]">Her Name</span> ❤️</h1>
-            <div className="my-5 inline-block animate-[heartbeat_1.3s_infinite] text-[5rem] motion-reduce:animate-none">❤️</div>
-            <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">
-              There are some things I find difficult to say in person... so I
-              decided to make this little place just for you.
+
+      {/* Scroll progress */}
+      <div className="fixed left-0 top-0 z-50 h-[2px] w-full bg-white/5">
+        <div
+          className="h-full bg-gradient-to-r from-[#d75b91] via-[#ffc0d5] to-[#e8a7b9] transition-[width] duration-150"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <main className="relative z-10 mx-auto w-[min(900px,92%)]">
+        {/* HERO SECTION */}
+        <section className="grid min-h-screen place-items-center py-20 text-center">
+          <div className="glass-card fade-up relative w-full max-w-[740px] overflow-hidden rounded-[36px] px-7 py-14 sm:px-14 sm:py-20">
+            <div className="absolute left-0 top-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#ffabc9] to-transparent" />
+
+            <div className="mb-9 inline-flex items-center gap-2 rounded-full border border-[#f8b6cc]/20 bg-[#f8b6cc]/10 px-5 py-2 text-[11px] font-medium uppercase tracking-[3px] text-[#ffc1d6]">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff9cbd]" />
+              A little something for you
+            </div>
+
+            <div className="mb-7 text-6xl text-[#ffb1ca] sm:text-7xl">
+              <span className="heart-beat inline-block">♡</span>
+            </div>
+
+            <p className="mb-4 text-xs uppercase tracking-[5px] text-[#d9a5b7]">
+              A message from my heart
             </p>
+
+            <h1 className="mb-7 font-serif text-5xl leading-tight tracking-tight sm:text-7xl">
+              Hey,
+              <br />
+              <span className="bg-gradient-to-r from-[#ffb5cf] via-[#ffe0e9] to-[#e7a0bb] bg-clip-text italic text-transparent">
+                ****
+              </span>
+              <span className="text-[#ff9cbd]">.</span>
+            </h1>
+
+            <div className="mx-auto mb-8 h-px w-20 bg-gradient-to-r from-transparent via-[#e9a5bd] to-transparent" />
+
+            <p className="mx-auto max-w-[470px] text-base leading-8 text-white/70 sm:text-lg">
+              There are some things I find difficult to say in person... so I
+              decided to create this little place just for you.
+            </p>
+
             <button
               type="button"
-              className="mt-[30px] cursor-pointer rounded-[50px] border-0 bg-white px-7 py-[15px] text-base font-bold text-[#8b1238] transition duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:shadow-[0_12px_30px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-[#ffd1df] focus-visible:outline-offset-4"
-              onClick={() =>
-                storyRef.current?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={scrollToStory}
+              className="group mt-11 inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#f6b4cb] to-[#e995b5] px-8 py-4 text-sm font-semibold text-[#401426] shadow-[0_10px_35px_rgba(232,126,166,0.2)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_45px_rgba(232,126,166,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffc1d6]"
             >
-              Open My Heart ❤️
+              Open My Heart
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
             </button>
-            <div className="mt-[35px] animate-[bounce_2s_infinite] text-[0.9rem] opacity-70 motion-reduce:animate-none">Scroll down ↓</div>
+
+            <div className="mt-14 flex items-center justify-center gap-3 text-xs tracking-[3px] text-white/35">
+              <span className="h-px w-8 bg-white/20" />
+              SCROLL TO EXPLORE
+              <span className="h-px w-8 bg-white/20" />
+            </div>
+
+            <div className="mt-5 animate-bounce text-[#f2abc4]/60">↓</div>
           </div>
         </section>
 
-        <section id="story" className="grid min-h-screen place-items-center py-10 text-center" ref={storyRef}>
-          <div className="w-full max-w-[700px] rounded-[30px] border border-white/20 bg-white/[0.12] px-[30px] py-[50px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-[18px] max-[600px]:px-5 max-[600px]:py-10">
-            <div className="mb-[15px] text-base uppercase tracking-[2px] opacity-80">
+        {/* STORY SECTION */}
+        <section
+          id="story"
+          ref={storyRef}
+          className="grid min-h-screen scroll-mt-10 place-items-center py-20"
+        >
+          <div className="glass-card relative w-full max-w-[740px] rounded-[36px] px-7 py-14 text-center sm:px-14 sm:py-20">
+            <span className="absolute right-8 top-7 font-serif text-6xl text-[#ffb7ce]/10">
+              01
+            </span>
+
+            <div className="mb-8 text-4xl">🌸</div>
+
+            <p className="mb-5 text-xs uppercase tracking-[4px] text-[#e9a9c0]">
               Something I wanted to tell you
-            </div>
-            <h2 className="mb-5 text-[clamp(2rem,6vw,3.5rem)]">You became special to me 🌸</h2>
-            <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">
-              I don&apos;t know exactly when it happened. Maybe it was your
-              smile. Maybe it was the way you talk. Or maybe it was just the
-              feeling I get whenever you&apos;re around.
             </p>
-            <br />
-            <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">
+
+            <h2 className="mb-9 font-serif text-4xl leading-tight sm:text-5xl">
+              You became
+              <br />
+              <span className="italic text-[#f5afc7]">special to me.</span>
+            </h2>
+
+            <div className="mx-auto mb-9 h-px w-16 bg-[#e7a2bc]/50" />
+
+            <p className="mx-auto max-w-[520px] text-base leading-9 text-white/70 sm:text-lg">
+              I don't know exactly when it happened. Maybe it was your smile.
+              Maybe it was the way you talk. Or maybe it was just the feeling I
+              get whenever you're around.
+            </p>
+
+            <p className="mx-auto mt-7 max-w-[520px] text-base leading-9 text-white/70 sm:text-lg">
               Somewhere along the way, I started looking forward to seeing you a
               little more than usual.
             </p>
+
+            <div className="mt-12 text-2xl text-[#e9a9c0]/60">✧</div>
           </div>
         </section>
 
-        <section className="grid min-h-screen place-items-center py-10 text-center">
-          <div className="w-full max-w-[700px] rounded-[30px] border border-white/20 bg-white/[0.12] px-[30px] py-[50px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-[18px] max-[600px]:px-5 max-[600px]:py-10">
-            <div className="mb-[15px] text-base uppercase tracking-[2px] opacity-80">A few reasons</div>
-            <h2 className="mb-5 text-[clamp(2rem,6vw,3.5rem)]">What I like about you ❤️</h2>
-            <div className="mt-[30px] grid gap-[15px] [&>*:nth-child(2)]:[animation-delay:200ms] [&>*:nth-child(3)]:[animation-delay:400ms] [&>*:nth-child(4)]:[animation-delay:600ms]">
-              <div className="[transform:translateY(20px)] animate-[reveal_0.7s_forwards] rounded-[18px] bg-white/10 p-[18px] opacity-0 motion-reduce:animate-none">
-                ✨ Your smile can make an ordinary day feel better.
-              </div>
-              <div className="[transform:translateY(20px)] animate-[reveal_0.7s_forwards] rounded-[18px] bg-white/10 p-[18px] opacity-0 motion-reduce:animate-none">
-                🌸 I love the little things that make you uniquely you.
-              </div>
-              <div className="[transform:translateY(20px)] animate-[reveal_0.7s_forwards] rounded-[18px] bg-white/10 p-[18px] opacity-0 motion-reduce:animate-none">
-                ❤️ Somehow, thinking about you always makes me smile.
-              </div>
-              <div className="[transform:translateY(20px)] animate-[reveal_0.7s_forwards] rounded-[18px] bg-white/10 p-[18px] opacity-0 motion-reduce:animate-none">
-                🌙 Being around you feels special in a way I can&apos;t
-                completely explain.
-              </div>
+        {/* REASONS SECTION */}
+        <section className="grid min-h-screen place-items-center py-20">
+          <div className="glass-card w-full max-w-[740px] rounded-[36px] px-7 py-14 text-center sm:px-14 sm:py-20">
+            <div className="mb-8 text-4xl">💗</div>
+
+            <p className="mb-5 text-xs uppercase tracking-[4px] text-[#e9a9c0]">
+              A few little things
+            </p>
+
+            <h2 className="mb-4 font-serif text-4xl sm:text-5xl">
+              What I like
+              <br />
+              <span className="italic text-[#f5afc7]">about you.</span>
+            </h2>
+
+            <p className="mb-12 text-sm text-white/45">
+              It's the little things that matter.
+            </p>
+
+            <div className="grid gap-4 text-left sm:grid-cols-2">
+              {reasons.map((reason, index) => (
+                <div
+                  key={reason.title}
+                  className="group rounded-[22px] border border-white/[0.08] bg-white/[0.045] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#f3a8c4]/30 hover:bg-[#e99ab9]/[0.09]"
+                  style={{
+                    animation: `fade-up 0.7s ease-out ${index * 150}ms both`,
+                  }}
+                >
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#f4b2ca]/15 bg-[#f4b2ca]/10 text-2xl transition-transform duration-300 group-hover:scale-110">
+                    {reason.icon}
+                  </div>
+
+                  <h3 className="mb-3 font-serif text-xl text-[#ffd2e0]">
+                    {reason.title}
+                  </h3>
+
+                  <p className="text-sm leading-7 text-white/55">
+                    {reason.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="grid min-h-screen place-items-center py-10 text-center">
-          <div className="w-full max-w-[700px] rounded-[30px] border border-white/20 bg-white/[0.12] px-[30px] py-[50px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-[18px] max-[600px]:px-5 max-[600px]:py-10">
-            <div className="mb-[15px] text-base uppercase tracking-[2px] opacity-80">And finally...</div>
-            <h2 className="mb-5 text-[clamp(2rem,6vw,3.5rem)]">There&apos;s something I want to ask you ❤️</h2>
-            <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">
-              I don&apos;t want to pressure you, and I don&apos;t expect you to
-              feel the same way.
-            </p>
-            <br />
-            <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">I just wanted to be honest about something...</p>
-            <div className="my-5 inline-block animate-[heartbeat_1.3s_infinite] text-[5rem] motion-reduce:animate-none">💗</div>
-            <button
-              type="button"
-              className="mt-[30px] cursor-pointer rounded-[50px] border-0 bg-white px-7 py-[15px] text-base font-bold text-[#8b1238] transition duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:shadow-[0_12px_30px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-[#ffd1df] focus-visible:outline-offset-4"
-              onClick={revealMessage}
-            >
-              Click for the truth
-            </button>
-            {messageVisible && (
-              <div className="mt-[30px] animate-[reveal_0.7s_forwards] rounded-[20px] bg-white/[0.12] p-[25px]" ref={messageRef}>
-                <h2 className="mb-5 text-[clamp(2rem,6vw,3.5rem)]">I like you. A lot. ❤️</h2>
-                <p className="text-[1.1rem] leading-[1.8] opacity-[0.95] max-[600px]:text-base">
-                  You mean more to me than I probably manage to show. And if
-                  you&apos;re comfortable with it, I&apos;d love the chance to
-                  know you even better.
-                </p>
-                <p className="mt-[25px] text-[1.3rem] italic">
-                  — From someone who thinks you&apos;re really special ❤️
-                </p>
+        {/* CONFESSION SECTION */}
+        <section className="grid min-h-screen place-items-center py-20">
+          <div className="glass-card relative w-full max-w-[740px] overflow-hidden rounded-[36px] px-7 py-14 text-center sm:px-14 sm:py-20">
+            <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#e75f96]/10 blur-[80px]" />
+
+            <div className="relative">
+              <div className="mb-8 text-4xl">💌</div>
+
+              <p className="mb-5 text-xs uppercase tracking-[4px] text-[#e9a9c0]">
+                And finally...
+              </p>
+
+              <h2 className="mb-9 font-serif text-4xl leading-tight sm:text-5xl">
+                There's something
+                <br />
+                <span className="italic text-[#f5afc7]">
+                  I want to ask you.
+                </span>
+              </h2>
+
+              <p className="mx-auto max-w-[480px] text-base leading-8 text-white/65">
+                I don't want to pressure you, and I don't expect you to feel the
+                same way.
+              </p>
+
+              <p className="mt-5 text-base leading-8 text-white/65">
+                I just wanted to be honest about something...
+              </p>
+
+              <div className="my-10 text-6xl text-[#ffabc8]">
+                <span className="heart-beat inline-block">♥</span>
               </div>
-            )}
+
+              {!messageVisible ? (
+                <button
+                  type="button"
+                  onClick={revealMessage}
+                  className="group inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#f6b4cb] to-[#e995b5] px-9 py-4 text-sm font-semibold text-[#401426] shadow-[0_10px_35px_rgba(232,126,166,0.2)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_45px_rgba(232,126,166,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffc1d6]"
+                >
+                  Reveal My Feelings
+                  <span className="transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </button>
+              ) : (
+                <div
+                  ref={messageRef}
+                  className="reveal mt-10 rounded-[28px] border border-[#f2b0c8]/20 bg-gradient-to-br from-[#f4a6c1]/10 to-[#ffffff]/[0.035] p-7 shadow-[0_20px_60px_rgba(0,0,0,0.15)] sm:p-10"
+                >
+                  <div className="mb-7 text-3xl">❤️</div>
+
+                  <h3 className="mb-7 font-serif text-4xl leading-tight text-[#ffd0df] sm:text-5xl">
+                    I like you.
+                    <br />
+                    <span className="italic">A lot.</span>
+                  </h3>
+
+                  <div className="mx-auto mb-7 h-px w-16 bg-[#e7a2bc]/50" />
+
+                  <p className="text-base leading-9 text-white/75">
+                    You mean more to me than I probably manage to show. And if
+                    you're comfortable with it, I'd love the chance to know you
+                    even better.
+                  </p>
+
+                  <p className="mt-9 font-serif text-lg italic text-[#f1b4ca]">
+                    — From someone who thinks you're really special ♡
+                  </p>
+
+                  <div className="mt-8 text-2xl text-[#f2abc4]/70">✧</div>
+                </div>
+              )}
+
+              <p className="mt-12 text-xs tracking-[3px] text-white/30">
+                MADE WITH A LITTLE EXTRA LOVE
+              </p>
+            </div>
           </div>
         </section>
+
+        {/* FOOTER */}
+        <footer className="pb-12 pt-5 text-center">
+          <div className="mb-5 text-xl text-[#f3a8c4]">♡</div>
+
+          <p className="font-serif text-lg italic text-white/55">
+            Some feelings deserve a little space.
+          </p>
+
+          <p className="mt-4 text-[10px] tracking-[3px] text-white/25">
+            JUST FOR YOU · WITH LOVE
+          </p>
+        </footer>
       </main>
     </div>
   );
