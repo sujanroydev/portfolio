@@ -1,8 +1,9 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import CurrentYear from "../../components/CurrentYear";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Chrona — Windows Laptop Activity Tracker",
   description:
     "Chrona is a lightweight Windows laptop activity tracker that helps you understand how you spend time on your computer.",

@@ -1,7 +1,9 @@
 "use client";
 
+import type { FormEvent } from "react";
+
 export default function ContactForm() {
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") || "").trim();
@@ -14,8 +16,12 @@ export default function ContactForm() {
   }
 
   return (
-    <form id="contact-form" onSubmit={handleSubmit}>
-      <label className="visually-hidden" htmlFor="contact-name">
+    <form
+      id="contact-form"
+      onSubmit={handleSubmit}
+      className="mx-auto mb-10 flex max-w-[420px] flex-col gap-4"
+    >
+      <label className="sr-only" htmlFor="contact-name">
         Your Name
       </label>
       <input
@@ -25,8 +31,9 @@ export default function ContactForm() {
         placeholder="Your Name"
         autoComplete="name"
         required
+        className="rounded-xl border border-glass-border bg-glass-bg p-[14px] text-base text-white"
       />
-      <label className="visually-hidden" htmlFor="contact-message">
+      <label className="sr-only" htmlFor="contact-message">
         Your Message
       </label>
       <textarea
@@ -34,8 +41,14 @@ export default function ContactForm() {
         name="message"
         placeholder="Your Message"
         required
+        className="min-h-[120px] resize-y rounded-xl border border-glass-border bg-glass-bg p-[14px] text-base text-white"
       />
-      <button type="submit">Send Email</button>
+      <button
+        type="submit"
+        className="cursor-pointer rounded-xl border-0 bg-accent p-[14px] font-bold text-black hover:bg-[#39dcaf]"
+      >
+        Send Email
+      </button>
     </form>
   );
 }

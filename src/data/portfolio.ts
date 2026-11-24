@@ -1,4 +1,27 @@
-export const education = [
+export interface Education {
+  school: string;
+  qualification: string;
+  image: string;
+  alt: string;
+}
+
+export type Skill = readonly [name: string, icon: string];
+
+export interface SkillGroup {
+  title: string;
+  skills: Skill[];
+}
+
+export type ProjectTechnology = readonly [name: string, icon: string];
+
+export interface Project {
+  name: string;
+  url: string;
+  description: string;
+  technologies: ProjectTechnology[];
+}
+
+export const education: Education[] = [
   {
     school: "Lovely Professional University",
     qualification: "Bachelor of Computer Application (BCA)",
@@ -25,7 +48,7 @@ export const education = [
   },
 ];
 
-export const skillGroups = [
+export const skillGroups: SkillGroup[] = [
   {
     title: "Languages",
     skills: [
@@ -54,7 +77,7 @@ export const skillGroups = [
   },
 ];
 
-export const projects = [
+export const projects: Project[] = [
   {
     name: "Knowlet",
     url: "https://knowlet.in/",

@@ -19,9 +19,13 @@ export default function HomePage() {
         <Projects />
         <GitHubStats />
         <Contact />
-        <Reveal as="section" id="social-links" className="section">
-          <h2>Find Me Online</h2>
-          <div className="social-links">
+        <Reveal
+          as="section"
+          id="social-links"
+          className="mx-auto max-w-[1200px] scroll-mt-[70px] px-[22px] py-[90px] text-center"
+        >
+          <h2 className="mb-[30px] text-[1.9rem] text-accent md:text-[2.2rem]">Find Me Online</h2>
+          <div className="flex flex-wrap justify-center gap-[14px]">
             <a href="https://github.com/sujanroydev" target="_blank" rel="noopener noreferrer" className="btn">
               GitHub
             </a>

@@ -1,5 +1,7 @@
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,7 +15,7 @@ const poppins = Poppins({
   display: "swap",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://sujanroy.in"),
   title: "Sujan Kumar Roy | Portfolio",
   description:
@@ -40,7 +42,11 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <head>

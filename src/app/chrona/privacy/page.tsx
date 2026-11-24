@@ -1,8 +1,9 @@
 import styles from "../page.module.css";
 import Link from "next/link";
 import CurrentYear from "../../../components/CurrentYear";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Privacy Policy — Chrona",
   description:
     "Privacy Policy for Chrona, a lightweight Windows laptop activity tracker.",

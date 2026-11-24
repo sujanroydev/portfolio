@@ -1,4 +1,7 @@
-export const metadata = {
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+export const metadata: Metadata = {
   title: "A Little Something For You ❤️",
   description: "A personal message made with love.",
   alternates: {
@@ -13,6 +16,10 @@ export const metadata = {
   },
 };
 
-export default function ForYouLayout({ children }) {
+interface ForYouLayoutProps {
+  children: ReactNode;
+}
+
+export default function ForYouLayout({ children }: ForYouLayoutProps) {
   return children;
 }

@@ -3,14 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
+interface FloatingHeart {
+  id: number;
+  left: string;
+  size: string;
+  duration: string;
+  delay: string;
+  emoji: string;
+  expiresAt: number;
+}
+
 export default function ForYouPage() {
-  const [hearts, setHearts] = useState([]);
+  const [hearts, setHearts] = useState<FloatingHeart[]>([]);
   const [messageVisible, setMessageVisible] = useState(false);
   const heartId = useRef(0);
-  const storyRef = useRef(null);
-  const messageRef = useRef(null);
+  const storyRef = useRef<HTMLElement | null>(null);
+  const messageRef = useRef<HTMLDivElement | null>(null);
 
-  function createHeart(delay = 0) {
+  function createHeart(delay = 0): FloatingHeart {
     const duration = Math.random() * 5 + 6;
     return {
       id: heartId.current++,

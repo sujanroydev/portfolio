@@ -1,8 +1,9 @@
 import styles from "./page.module.css";
 import Reveal from "../../components/portfolio/Reveal";
 import CurrentYear from "../../components/CurrentYear";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "BuildFromCode",
   description:
     "BuildFromCode is a developer-focused YouTube channel where you learn by building real apps—from idea and coding to deployment using modern web technologies.",

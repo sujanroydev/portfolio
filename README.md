@@ -1,9 +1,13 @@
 # Sujan Kumar Roy — Portfolio
 
-The portfolio and companion pages are built with Next.js App Router, React, and
-JavaScript. Existing copy, project links, imagery, visual styles, and page
-interactions have been retained while the original static pages were migrated
-to reusable components and route-specific styles.
+The portfolio and companion pages are built with Next.js App Router, React,
+TypeScript, and Tailwind CSS v4. Existing copy, project links, imagery, visual
+styles, and page interactions have been retained while the original static
+pages were migrated to reusable components and route-specific styles.
+
+Tailwind utilities handle shared portfolio layout and controls. CSS Modules
+remain for the bespoke companion-page designs, including their gradients,
+pseudo-elements, and animations.
 
 ## Routes
 
@@ -29,6 +33,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm run lint
+npm run typecheck
 npm run build
 npm start
 ```

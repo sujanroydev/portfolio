@@ -1,15 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import type { ReactElement, ReactNode, RefCallback } from "react";
 
-export default function Reveal({ as: Element = "div", className = "", children, ...props }) {
-  const ref = useRef(null);
+type RevealTag = "article" | "div" | "header" | "section";
+
+interface RevealProps {
+  as?: RevealTag;
+  className?: string;
+  children: ReactNode;
+  id?: string;
+}
+
+export default function Reveal({
+  as: Element = "div",
+  className = "",
+  children,
+  id,
+}: RevealProps): ReactElement {
+  const [node, setNode] = useState<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
+  const setObservedNode: RefCallback<HTMLElement> = (element) => setNode(element);
 
   useEffect(() => {
-    const node = ref.current;
     if (!node) return;
-    if (!("IntersectionObserver" in window)) {
+    if (typeof window.IntersectionObserver === "undefined") {
       const frame = window.requestAnimationFrame(() => setVisible(true));
       return () => window.cancelAnimationFrame(frame);
     }
@@ -25,13 +40,13 @@ export default function Reveal({ as: Element = "div", className = "", children, 
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [node]);
 
   return (
     <Element
-      ref={ref}
+      ref={setObservedNode}
       className={`${className} fade-in${visible ? " show" : ""}`.trim()}
-      {...props}
+      id={id}
     >
       {children}
     </Element>
