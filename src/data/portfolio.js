@@ -80,6 +80,18 @@ export const projects = [
     ],
   },
   {
+    name: "NOTES.md",
+    url: "https://notesmdweb.vercel.app/",
+    description:
+      "DigitalRDN is a modern e-commerce interface showcasing responsive design, product layouts, and smooth user shopping experience.",
+    technologies: [
+      ["Nextjs", "devicon-nextjs-plain"],
+      ["Tailwind CSS", "devicon-tailwindcss-plain"],
+      ["JavaScript", "devicon-javascript-plain"],
+      ["Supabase", "devicon-supabase-plain"],
+    ],
+  },
+  {
     name: "DigitalRDN",
     url: "https://digitalrdn.netlify.app/",
     description:
