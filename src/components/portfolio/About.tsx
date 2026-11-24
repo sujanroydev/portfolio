@@ -25,7 +25,7 @@ export default function About() {
       <div className="mx-auto grid max-w-[720px] gap-[25px]">
         {education.map((item) => (
           <article
-            className="timeline-item flex items-center gap-5 p-[25px] text-left max-[480px]:flex-col max-[480px]:items-start max-[480px]:gap-[15px]"
+            className="flex items-center gap-5 rounded-2xl border border-glass-border border-l-4 border-l-accent bg-glass-bg p-[25px] text-left backdrop-blur-[15px] transition duration-300 hover:-translate-y-1.5 hover:bg-white/10 max-[480px]:flex-col max-[480px]:items-start max-[480px]:gap-[15px]"
             key={item.school}
           >
             <Image

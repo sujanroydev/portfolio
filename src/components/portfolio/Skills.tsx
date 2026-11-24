@@ -16,13 +16,22 @@ export default function Skills() {
           <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-5">
             {group.skills.map(([name, icon]) => (
               <div
-                className="skill-card flex flex-col items-center justify-center gap-2.5 p-5 text-center"
+                className="group flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-glass-border bg-glass-bg p-5 text-center backdrop-blur-[15px] transition duration-300 hover:-translate-y-1.5 hover:bg-white/10"
                 key={name}
               >
                 {icon.startsWith("/") ? (
-                  <Image src={icon} alt="" width={40} height={40} className="h-10 w-10 object-contain" />
+                  <Image
+                    src={icon}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-120"
+                  />
                 ) : (
-                  <i className={`${icon} colored text-[40px]`} aria-hidden="true" />
+                  <i
+                    className={`${icon} colored text-[40px] transition-transform duration-300 group-hover:scale-120`}
+                    aria-hidden="true"
+                  />
                 )}
                 <span>{name}</span>
               </div>

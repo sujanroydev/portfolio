@@ -5,9 +5,9 @@ TypeScript, and Tailwind CSS v4. Existing copy, project links, imagery, visual
 styles, and page interactions have been retained while the original static
 pages were migrated to reusable components and route-specific styles.
 
-Tailwind utilities handle shared portfolio layout and controls. CSS Modules
-remain for the bespoke companion-page designs, including their gradients,
-pseudo-elements, and animations.
+Tailwind utilities handle component and route styling. `globals.css` is limited
+to the shared theme and base styles, focus treatment, and custom keyframe
+animations used by the personal message page.
 
 ## Routes
 

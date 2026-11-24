@@ -13,10 +13,6 @@
   --accent: #4df2c9;
   --glass-bg: rgba(255, 255, 255, 0.06);
   --glass-border: rgba(255, 255, 255, 0.18);
-  --prj-card-bg: rgba(255, 255, 255, 0.05);
-  --prj-border: rgba(255, 255, 255, 0.1);
-  --desktop-width: 1280px;
-  --desktop-height: 800px;
 }
 
 html {
@@ -30,157 +26,62 @@ body {
   line-height: 1.6;
 }
 
-.btn {
-  @apply m-[6px] inline-block rounded-[10px] bg-accent px-[26px] py-3 font-semibold text-black no-underline transition duration-250 ease-in-out;
-}
-
-.btn:hover {
-  @apply -translate-y-0.5 bg-[#38d8b4];
-}
-
-.skill-card,
-.timeline-item {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(15px);
-  border-radius: 16px;
-  transition: 0.3s ease;
-}
-
-.skill-card i {
-  transition: 0.3s ease;
-}
-
-.skill-card:hover i,
-.skill-card:hover img {
-  transform: scale(1.2);
-}
-
-.skill-card:hover,
-.timeline-item:hover {
-  transform: translateY(-6px);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.timeline {
-  max-width: 720px;
-  margin: auto;
-  display: grid;
-  gap: 25px;
-}
-
-.timeline-item {
-  text-align: left;
-  border-left: 4px solid var(--accent);
-}
-
-.browser-window {
-  background: var(--prj-card-bg);
-  border: 1px solid var(--prj-border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  text-align: left;
-}
-
-.browser-window:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  border-color: var(--accent);
-}
-
-.browser-header {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 12px;
-  display: flex;
-  gap: 6px;
-  border-bottom: 1px solid var(--prj-border);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.preview-viewport {
-  width: 100%;
-  height: 220px;
-  position: relative;
-  overflow: hidden;
-  background: #1a1a1a;
-}
-
-.preview-viewport iframe {
-  width: var(--desktop-width);
-  height: var(--desktop-height);
-  border: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.25);
-  transform-origin: center;
-  pointer-events: none;
-}
-
-.tech-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 16px 0 18px;
-}
-
-.tech-stack span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  transition: 0.3s ease;
-}
-
-.tech-stack span i {
-  font-size: 1rem;
-}
-
-.tech-stack span:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  background: rgba(77, 242, 201, 0.08);
-  box-shadow: 0 8px 18px rgba(77, 242, 201, 0.12);
-}
-
-.site-footer {
-  text-align: center;
-  padding: 30px 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0d0d0d;
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 0.8s ease;
-}
-
-.fade-in.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.8;
+  }
+
+  to {
+    transform: translateY(-110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.2);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes reveal {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(10px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -189,5 +90,7 @@ body {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

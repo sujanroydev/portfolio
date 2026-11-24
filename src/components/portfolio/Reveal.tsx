@@ -45,7 +45,9 @@ export default function Reveal({
   return (
     <Element
       ref={setObservedNode}
-      className={`${className} fade-in${visible ? " show" : ""}`.trim()}
+      className={`${className} transition-all duration-[800ms] ease-[ease] ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+      }`.trim()}
       id={id}
     >
       {children}

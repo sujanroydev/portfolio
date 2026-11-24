@@ -27,10 +27,16 @@ export default function Hero() {
         Web Developer • Tech Explorer • BCA Student
       </p>
       <div>
-        <a href="#projects" className="btn">
+        <a
+          href="#projects"
+          className="m-[6px] inline-block rounded-[10px] bg-accent px-[26px] py-3 font-semibold text-black no-underline transition duration-250 ease-in-out hover:-translate-y-0.5 hover:bg-[#38d8b4]"
+        >
           View Projects
         </a>
-        <a href="#contact" className="btn">
+        <a
+          href="#contact"
+          className="m-[6px] inline-block rounded-[10px] bg-accent px-[26px] py-3 font-semibold text-black no-underline transition duration-250 ease-in-out hover:-translate-y-0.5 hover:bg-[#38d8b4]"
+        >
           Contact Me
         </a>
       </div>
