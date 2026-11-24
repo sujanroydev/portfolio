@@ -20,6 +20,12 @@ const pages = [
     icon: "❤️",
   },
   {
+    title: "Feelings",
+    description: "Everything I've been feeling but couldn't say.",
+    href: "/for-you/feelings",
+    icon: "🥀",
+  },
+  {
     title: "Letter",
     description: "Some words written for you.",
     href: "/for-you/letter",
