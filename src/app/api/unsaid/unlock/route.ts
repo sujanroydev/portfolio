@@ -9,7 +9,7 @@ const SESSION_DURATION = 60 * 60 * 24 * 7; // 7 days
 function createSessionToken(password: string, secret: string) {
   const expiresAt = Math.floor(Date.now() / 1000) + SESSION_DURATION;
 
-  const payload = `for-you:${expiresAt}`;
+  const payload = `unsaid:${expiresAt}`;
   const signature = createHmac("sha256", secret)
     .update(`${payload}:${password}`)
     .digest("hex");

@@ -19,7 +19,7 @@ function isValidSession(token: string | undefined): boolean {
 
   const [prefix, expiresAtString, receivedSignature] = parts;
 
-  if (prefix !== "for-you" || !/^\d+$/.test(expiresAtString)) {
+  if (prefix !== "unsaid" || !/^\d+$/.test(expiresAtString)) {
     return false;
   }
 
