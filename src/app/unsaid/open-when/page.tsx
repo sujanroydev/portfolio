@@ -106,7 +106,7 @@ export default function OpenWhenPage() {
       <div className="relative mx-auto max-w-5xl">
         {/* Back link */}
         <Link
-          href="/for-you"
+          href="/unsaid"
           className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-rose-300"
         >
           <span>←</span> Back to home

@@ -261,7 +261,7 @@ export default function IfPage() {
         {/* Footer */}
         <div className="mt-10 text-center">
           <Link
-            href="/for-you"
+            href="/unsaid"
             className="text-sm text-white/40 transition hover:text-pink-200"
           >
             ← Back to the beginning

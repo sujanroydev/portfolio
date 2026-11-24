@@ -54,7 +54,7 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Always allow the password-entry page.
-  if (pathname === "/for-you/enter" || pathname === "/for-you/enter/") {
+  if (pathname === "/unsaid/enter" || pathname === "/unsaid/enter/") {
     return NextResponse.next();
   }
 
@@ -64,9 +64,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL("/for-you/enter", request.url));
+  return NextResponse.redirect(new URL("/unsaid/enter", request.url));
 }
 
 export const config = {
-  matcher: ["/for-you/:path*"],
+  matcher: ["/unsaid/:path*"],
 };

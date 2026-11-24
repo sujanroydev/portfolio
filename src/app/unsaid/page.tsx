@@ -2,117 +2,111 @@ import Link from "next/link";
 
 const pages = [
   {
-    title: "Home",
-    description: "The beginning of everything.",
-    href: "/for-you",
-    icon: "🏠",
-  },
-  {
     title: "Questions",
     description: "A few questions to answer.",
-    href: "/for-you/questions",
+    href: "/unsaid/questions",
     icon: "💭",
   },
   {
     title: "Love",
     description: "A little question from my heart.",
-    href: "/for-you/love",
+    href: "/unsaid/love",
     icon: "❤️",
   },
   {
     title: "Feelings",
     description: "Everything I've been feeling but couldn't say.",
-    href: "/for-you/feelings",
+    href: "/unsaid/feelings",
     icon: "🥀",
   },
   {
     title: "Letter",
     description: "Some words written for you.",
-    href: "/for-you/letter",
+    href: "/unsaid/letter",
     icon: "💌",
   },
   {
     title: "Memories",
     description: "A collection of moments.",
-    href: "/for-you/memories",
+    href: "/unsaid/memories",
     icon: "📸",
   },
   {
     title: "Reasons",
     description: "A few things I appreciate.",
-    href: "/for-you/reasons",
+    href: "/unsaid/reasons",
     icon: "🌷",
   },
   {
     title: "Surprise",
     description: "Something special awaits.",
-    href: "/for-you/surprise",
+    href: "/unsaid/surprise",
     icon: "🎁",
   },
   {
     title: "If...",
     description: "Some interesting what-ifs.",
-    href: "/for-you/if",
+    href: "/unsaid/if",
     icon: "✨",
   },
   {
     title: "Open When",
     description: "Letters for different moments.",
-    href: "/for-you/open-when",
+    href: "/unsaid/open-when",
     icon: "✉️",
   },
   {
     title: "Diary",
     description: "A few thoughts from my diary.",
-    href: "/for-you/diary",
+    href: "/unsaid/diary",
     icon: "📖",
   },
   {
     title: "Jar of Hearts",
     description: "Little notes, one at a time.",
-    href: "/for-you/jar",
+    href: "/unsaid/jar",
     icon: "🫙",
   },
   {
     title: "Scrapbook",
     description: "A little collection of pictures.",
-    href: "/for-you/scrapbook",
+    href: "/unsaid/scrapbook",
     icon: "🖼️",
   },
   {
     title: "Secret",
     description: "A little secret to discover.",
-    href: "/for-you/secret",
+    href: "/unsaid/secret",
     icon: "🔐",
   },
   {
     title: "Songs",
     description: "Songs with special meanings.",
-    href: "/for-you/songs",
+    href: "/unsaid/songs",
     icon: "🎵",
   },
   {
     title: "This or That",
     description: "Choose between two things.",
-    href: "/for-you/this-or-that",
+    href: "/unsaid/this-or-that",
     icon: "⚖️",
   },
   {
     title: "Countdown",
     description: "A moment worth waiting for.",
-    href: "/for-you/time",
+    href: "/unsaid/time",
     icon: "⏳",
   },
   {
     title: "Universe",
     description: "Discover the hidden stars.",
-    href: "/for-you/universe",
+    href: "/unsaid/universe",
     icon: "🌌",
   },
   {
     title: "Make a Wish",
     description: "Write a wish and let it go.",
-    href: "/for-you/wish",
+    href: "/unsaid/wish",
     icon: "⭐",
   },
 ];
@@ -122,7 +116,7 @@ export default function PagesDirectory() {
     <main className="min-h-screen bg-[#0d0d0d] px-5 py-16 text-white sm:px-8">
       <div className="mx-auto max-w-6xl">
         <Link
-          href="/for-you"
+          href="/unsaid"
           className="mb-10 inline-flex items-center gap-2 text-sm text-pink-300 transition hover:text-pink-200"
         >
           ← Back to home

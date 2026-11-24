@@ -44,7 +44,7 @@ export default function WishPage() {
 
       <div className="relative w-full max-w-xl">
         <Link
-          href="/for-you"
+          href="/unsaid"
           className="mb-10 inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-purple-300"
         >
           ← Back to home

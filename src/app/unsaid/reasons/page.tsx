@@ -208,7 +208,7 @@ export default function ReasonsPage() {
         {/* Footer */}
         <footer className="mt-20 text-center">
           <Link
-            href="/for-you"
+            href="/unsaid"
             className="inline-flex rounded-full border border-pink-300/20 px-7 py-3 text-sm text-pink-200 transition hover:border-pink-300/50 hover:bg-pink-300/10"
           >
             ← Back to the beginning

@@ -279,7 +279,7 @@ export default function QuestionsPage() {
         {/* Footer */}
         <div className="mt-8 flex flex-col items-center gap-4 text-center">
           <Link
-            href="/for-you"
+            href="/unsaid"
             className="text-xs text-white/40 transition hover:text-[#f5afc7]"
           >
             ← Back to your little surprise

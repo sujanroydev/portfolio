@@ -12,7 +12,7 @@ animations used by the personal message page.
 ## Routes
 
 - `/` — portfolio, education, skills, projects, GitHub stats, and contact form
-- `/for-you` — personal message page with animated hearts
+- `/unsaid` — personal message page with animated hearts
 - `/bfc` — BuildFromCode landing page
 - `/chrona` — Chrona product page
 - `/chrona/privacy` — Chrona privacy policy

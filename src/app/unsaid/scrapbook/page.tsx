@@ -73,7 +73,7 @@ export default function ScrapbookPage() {
 
       <div className="relative mx-auto max-w-6xl">
         <Link
-          href="/for-you"
+          href="/unsaid"
           className="inline-flex items-center gap-2 text-sm text-[#806b5e] transition hover:text-rose-600"
         >
           ← Back to home

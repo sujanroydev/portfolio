@@ -103,7 +103,7 @@ export default function UniversePage() {
 
       <div className="relative mx-auto max-w-5xl">
         <Link
-          href="/for-you"
+          href="/unsaid"
           className="inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-purple-300"
         >
           ← Back to home

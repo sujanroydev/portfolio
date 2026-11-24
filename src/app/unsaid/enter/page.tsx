@@ -23,7 +23,7 @@ export default function EnterPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/for-you/unlock", {
+      const response = await fetch("/api/unsaid/unlock", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export default function EnterPage() {
         return;
       }
 
-      router.replace("/for-you");
+      router.replace("/unsaid");
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");

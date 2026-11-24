@@ -5,12 +5,12 @@ export const metadata: Metadata = {
   title: "A Little Something For You ❤️",
   description: "A personal message made with love.",
   alternates: {
-    canonical: "/for-you",
+    canonical: "/unsaid",
   },
   openGraph: {
     title: "A Little Something For You ❤️",
     description: "A personal message made with love.",
-    url: "https://sujanroy.in/for-you",
+    url: "https://sujanroy.in/unsaid",
     siteName: "Sujan Kumar Roy",
     type: "website",
   },

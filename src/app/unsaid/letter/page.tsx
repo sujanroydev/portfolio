@@ -148,7 +148,7 @@ export default function LetterPage() {
         {/* Footer */}
         <div className="mt-12 flex flex-col items-center gap-5 text-center">
           <Link
-            href="/for-you"
+            href="/unsaid"
             className="text-xs text-white/40 transition hover:text-[#f5afc7]"
           >
             ← Back to your little surprise

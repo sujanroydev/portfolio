@@ -126,7 +126,7 @@ export default function SurprisePage() {
 
         <footer className="mt-16">
           <Link
-            href="/for-you"
+            href="/unsaid"
             className="text-sm text-white/40 transition hover:text-pink-200"
           >
             ← Back to the beginning
