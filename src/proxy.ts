@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-const COOKIE_NAME = "for_you_session";
+const COOKIE_NAME = "unsaid_session";
 
 function isValidSession(token: string | undefined): boolean {
-  const password = process.env.FOR_YOU_PASSWORD;
-  const secret = process.env.FOR_YOU_SESSION_SECRET;
+  const password = process.env.UNSAID_PASSWORD;
+  const secret = process.env.UNSAID_SESSION_SECRET;
 
   if (!token || !password || !secret) {
     return false;

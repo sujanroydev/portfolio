@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
 
-const COOKIE_NAME = "for_you_session";
+const COOKIE_NAME = "unsaid_session";
 const SESSION_DURATION = 60 * 60 * 24 * 7; // 7 days
 
 function createSessionToken(password: string, secret: string) {
@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const expectedPassword = process.env.FOR_YOU_PASSWORD;
-    const sessionSecret = process.env.FOR_YOU_SESSION_SECRET;
+    const expectedPassword = process.env.UNSAID_PASSWORD;
+    const sessionSecret = process.env.UNSAID_SESSION_SECRET;
 
     if (!expectedPassword || !sessionSecret) {
       console.error("Missing FOR_YOU_PASSWORD or FOR_YOU_SESSION_SECRET.");
