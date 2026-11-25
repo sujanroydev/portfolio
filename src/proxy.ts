@@ -1,66 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac, timingSafeEqual } from "node:crypto";
-
-const COOKIE_NAME = "unsaid_session";
-
-function isValidSession(token: string | undefined): boolean {
-  const password = process.env.UNSAID_PASSWORD;
-  const secret = process.env.UNSAID_SESSION_SECRET;
-
-  if (!token || !password || !secret) {
-    return false;
-  }
-
-  const parts = token.split(":");
-
-  if (parts.length !== 3) {
-    return false;
-  }
-
-  const [prefix, expiresAtString, receivedSignature] = parts;
-
-  if (prefix !== "unsaid" || !/^\d+$/.test(expiresAtString)) {
-    return false;
-  }
-
-  const expiresAt = Number(expiresAtString);
-
-  if (
-    !Number.isSafeInteger(expiresAt) ||
-    expiresAt <= Math.floor(Date.now() / 1000)
-  ) {
-    return false;
-  }
-
-  if (!/^[a-f0-9]{64}$/i.test(receivedSignature)) {
-    return false;
-  }
-
-  const payload = `${prefix}:${expiresAtString}`;
-
-  const expectedSignature = createHmac("sha256", secret)
-    .update(`${payload}:${password}`)
-    .digest("hex");
-
-  const received = Buffer.from(receivedSignature, "hex");
-  const expected = Buffer.from(expectedSignature, "hex");
-
-  return (
-    received.length === expected.length && timingSafeEqual(received, expected)
-  );
-}
+import { UNSAID_COOKIE, verifyUnsaidSession } from "@/lib/unsaid-auth";
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Always allow the password-entry page.
   if (pathname === "/unsaid/enter" || pathname === "/unsaid/enter/") {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(COOKIE_NAME)?.value;
+  const token = request.cookies.get(UNSAID_COOKIE)?.value;
 
-  if (isValidSession(token)) {
+  if (verifyUnsaidSession(token)) {
     return NextResponse.next();
   }
 

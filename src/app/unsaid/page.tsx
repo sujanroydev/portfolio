@@ -80,6 +80,12 @@ const pages = [
     icon: "🔐",
   },
   {
+    title: "Through My Eyes",
+    description: "A little world of photographs and animations.",
+    href: "/unsaid/gallery",
+    icon: "📷",
+  },
+  {
     title: "Songs",
     description: "Songs with special meanings.",
     href: "/unsaid/songs",
