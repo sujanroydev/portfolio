@@ -26,7 +26,7 @@ export default function GalleryPage() {
   // Fetch private images from the authenticated API.
   const loadPhotos = useCallback(async () => {
     try {
-      const response = await fetch("/api/her-photos", {
+      const response = await fetch("/api/unsaid/her-photos", {
         cache: "no-store",
       });
 
