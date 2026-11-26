@@ -31,12 +31,12 @@ const pages = [
     href: "/unsaid/letter",
     icon: "💌",
   },
-  {
-    title: "Memories",
-    description: "A collection of moments.",
-    href: "/unsaid/memories",
-    icon: "📸",
-  },
+  // {
+  //   title: "Memories",
+  //   description: "A collection of moments.",
+  //   href: "/unsaid/memories",
+  //   icon: "📸",
+  // },
   {
     title: "Reasons",
     description: "A few things I appreciate.",
@@ -79,12 +79,12 @@ const pages = [
     href: "/unsaid/jar",
     icon: "🫙",
   },
-  {
-    title: "Scrapbook",
-    description: "A little collection of pictures.",
-    href: "/unsaid/scrapbook",
-    icon: "🖼️",
-  },
+  // {
+  //   title: "Scrapbook",
+  //   description: "A little collection of pictures.",
+  //   href: "/unsaid/scrapbook",
+  //   icon: "🖼️",
+  // },
   {
     title: "Secret",
     description: "A little secret to discover.",
@@ -97,12 +97,12 @@ const pages = [
     href: "/unsaid/gallery",
     icon: "📷",
   },
-  {
-    title: "Songs",
-    description: "Songs with special meanings.",
-    href: "/unsaid/songs",
-    icon: "🎵",
-  },
+  // {
+  //   title: "Songs",
+  //   description: "Songs with special meanings.",
+  //   href: "/unsaid/songs",
+  //   icon: "🎵",
+  // },
   {
     title: "This or That",
     description: "Choose between two things.",

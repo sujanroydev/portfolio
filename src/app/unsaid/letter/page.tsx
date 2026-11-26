@@ -41,7 +41,12 @@ export default function LetterPage() {
               type="button"
               onClick={() => {
                 setOpened(true);
-                void trackActivity("letter", "Letter opened", { letter: "Words I couldn't say out loud" }, "item_revealed");
+                void trackActivity(
+                  "letter",
+                  "Letter opened",
+                  { letter: "Words I couldn't say out loud" },
+                  "item_revealed",
+                );
               }}
               aria-label="Open your letter"
               className="group mx-auto block w-full max-w-[440px] text-center focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#ffc1d6]"
@@ -86,7 +91,7 @@ export default function LetterPage() {
                 </div>
 
                 <h2 className="mb-10 font-serif text-4xl italic text-[#813b57] sm:text-5xl">
-                  Dear Her Name,
+                  Dear Diya,
                 </h2>
 
                 <div className="space-y-6 font-serif text-[16px] leading-[2] text-[#684450] sm:text-lg">
