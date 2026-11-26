@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import LazyImage from "@/components/unsaid/LazyImage";
 
 type Photo = {
   path: string;
@@ -23,6 +24,9 @@ export default function GalleryPage() {
 
   const reduceMotion = useReducedMotion();
 
+  const activePathRef = useRef<string | undefined>(undefined);
+  activePathRef.current = photos[activeIndex]?.path;
+
   // Fetch private images from the authenticated API.
   const loadPhotos = useCallback(async () => {
     try {
@@ -36,27 +40,23 @@ export default function GalleryPage() {
 
       const data = (await response.json()) as PhotoResponse;
 
-      setPhotos((previous) => {
-        // Keep the currently displayed image when URLs refresh.
-        const currentPath = previous[activeIndex]?.path;
-        const nextIndex = data.photos.findIndex(
-          (photo) => photo.path === currentPath,
-        );
+      const currentPath = activePathRef.current;
+      const nextIndex = data.photos.findIndex(
+        (photo) => photo.path === currentPath,
+      );
 
-        if (nextIndex >= 0) {
-          setActiveIndex(nextIndex);
-        }
+      if (nextIndex >= 0) {
+        setActiveIndex(nextIndex);
+      }
 
-        return data.photos;
-      });
-
+      setPhotos(data.photos);
       setError("");
     } catch {
       setError("Couldn't load the photos. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [activeIndex]);
+  }, []);
 
   useEffect(() => {
     void loadPhotos();
@@ -70,6 +70,15 @@ export default function GalleryPage() {
 
     return () => window.clearInterval(refresh);
   }, [loadPhotos]);
+
+  useEffect(() => {
+    if (photos.length < 2) return;
+
+    const nextIndex = (activeIndex + 1) % photos.length;
+    const img = new window.Image();
+
+    img.src = photos[nextIndex].url;
+  }, [activeIndex, photos]);
 
   // Automatic slideshow.
   useEffect(() => {
@@ -363,12 +372,10 @@ export default function GalleryPage() {
               }}
               className="group rounded-sm bg-[#f3e8ed] p-2 pb-5 text-left shadow-xl shadow-black/30 sm:p-3 sm:pb-7"
             >
-              <img
+              <LazyImage
                 src={photo.url}
                 alt={`Gallery photograph ${index + 1}`}
-                loading="lazy"
-                decoding="async"
-                className="aspect-[3/4] w-full bg-[#d7c5ca] object-cover transition duration-500 group-hover:brightness-105"
+                className="aspect-[3/4] w-full bg-[#d7c5ca] object-cover"
               />
 
               <p className="mt-3 text-center font-serif text-xs italic text-[#51434a] sm:text-sm">

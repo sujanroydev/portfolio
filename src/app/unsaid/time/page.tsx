@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const TARGET_DATE = "2027-01-01T00:00:00+05:30";
+const TARGET_DATE = "2027-06-01T00:00:00+05:30";
 
 type TimeLeft = {
   days: number;
