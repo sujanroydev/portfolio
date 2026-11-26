@@ -14,6 +14,12 @@ const pages = [
     icon: "❤️",
   },
   {
+    title: "A Sky Full of Her",
+    description: "Discover little memories hidden among the stars.",
+    href: "/unsaid/constellation",
+    icon: "✦",
+  },
+  {
     title: "Feelings",
     description: "Everything I've been feeling but couldn't say.",
     href: "/unsaid/feelings",
@@ -48,6 +54,12 @@ const pages = [
     description: "Some interesting what-ifs.",
     href: "/unsaid/if",
     icon: "✨",
+  },
+  {
+    title: "Memory Roulette",
+    description: "Let a random little moment find you.",
+    href: "/unsaid/roulette",
+    icon: "🎲",
   },
   {
     title: "Open When",
