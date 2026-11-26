@@ -1,7 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
 import LazyImage from "@/components/unsaid/LazyImage";
 
 type Photo = {
@@ -14,6 +19,8 @@ type PhotoResponse = {
   message?: string;
 };
 
+const HEARTS = ["♡", "✦", "✧", "🥀", "💖"];
+
 export default function GalleryPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -23,6 +30,43 @@ export default function GalleryPage() {
   const [error, setError] = useState("");
 
   const reduceMotion = useReducedMotion();
+
+  // Page-entrance variants.
+  const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.11, delayChildren: 0.15 },
+    },
+  };
+
+  // Decorative floating hearts that drift upward. Disabled when the user
+  // prefers reduced motion.
+  const floatingHearts = useMemo(() => {
+    if (reduceMotion) return [];
+    return Array.from({ length: 16 }, (_, i) => {
+      const drift = -110 - ((i * 17) % 50);
+      return {
+        id: i,
+        char: HEARTS[i % HEARTS.length],
+        left: 8 + ((i * 13) % 88),
+        top: 10 + ((i * 19) % 88),
+        delay: i * 0.6,
+        duration: 10 + i * 1.1,
+        size: 15 + (i % 6) * 5,
+        drift,
+      };
+    });
+  }, [reduceMotion]);
 
   const activePathRef = useRef<string | undefined>(undefined);
   activePathRef.current = photos[activeIndex]?.path;
@@ -39,6 +83,12 @@ export default function GalleryPage() {
       }
 
       const data = (await response.json()) as PhotoResponse;
+
+      for (let i = data.photos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [data.photos[i], data.photos[j]] = [data.photos[j], data.photos[i]];
+      }
 
       const currentPath = activePathRef.current;
       const nextIndex = data.photos.findIndex(
@@ -202,28 +252,93 @@ export default function GalleryPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0d0d0d] text-[#f3e8ed] selection:bg-rose-300/30">
       {/* Background glow */}
-      <div className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-rose-900/20 blur-[130px]" />
+      <motion.div
+        animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-rose-900/20 blur-[130px]"
+      />
 
-      <div className="pointer-events-none fixed -right-40 top-[50%] h-96 w-96 rounded-full bg-pink-900/10 blur-[130px]" />
+      <motion.div
+        animate={{ x: [0, -25, 0], y: [0, -25, 0] }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 3,
+        }}
+        className="pointer-events-none fixed -right-40 top-[50%] h-96 w-96 rounded-full bg-pink-900/10 blur-[130px]"
+      />
+
+      {/* Floating decorative hearts */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+        {floatingHearts.map((heart) => (
+          <motion.span
+            key={heart.id}
+            style={{
+              left: `${heart.left}%`,
+              top: `${heart.top}%`,
+              fontSize: heart.size,
+              color: "rgba(232, 121, 149, 0.15)",
+            }}
+            initial={{ y: 0, opacity: 0 }}
+            animate={{
+              y: heart.drift,
+              opacity: [0, 0.45, 0],
+            }}
+            transition={{
+              delay: heart.delay,
+              duration: heart.duration,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {heart.char}
+          </motion.span>
+        ))}
+      </div>
 
       {/* Header */}
       <header className="relative px-5 pb-12 pt-20 text-center">
-        <p className="mb-5 text-xs tracking-[0.4em] text-rose-300/60 uppercase">
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="mb-5 text-xs tracking-[0.4em] text-rose-300/60 uppercase"
+        >
           A collection of little moments
-        </p>
+        </motion.p>
 
-        <h1 className="font-serif text-5xl leading-tight text-rose-100 sm:text-7xl">
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="font-serif text-5xl leading-tight text-rose-100 sm:text-7xl"
+        >
           Through My Eyes
-        </h1>
+        </motion.h1>
 
-        <p className="mx-auto mt-6 max-w-md text-sm leading-7 text-rose-100/50">
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="mx-auto mt-6 max-w-md text-sm leading-7 text-rose-100/50"
+        >
           Some pictures, some memories, and a hundred little reasons to pause
           for a moment.
-        </p>
+        </motion.p>
 
-        <div className="mt-8 text-rose-300/70">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="mt-8 text-rose-300/70"
+        >
           ♡ <span className="mx-2 text-xs">{photos.length} photographs</span> ♡
-        </div>
+        </motion.div>
       </header>
 
       {/* Cinematic slideshow */}
@@ -238,9 +353,20 @@ export default function GalleryPage() {
                 opacity: 0,
                 scale: reduceMotion ? 1 : 1.08,
               }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: reduceMotion ? 0 : [0, -10, 0],
+              }}
               exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
-              transition={{ duration: reduceMotion ? 0.15 : 1.1 }}
+              transition={{
+                duration: reduceMotion ? 0.15 : 1.1,
+                y: {
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+              }}
               className="absolute inset-0 h-full w-full cursor-zoom-in object-cover"
               onClick={() => setSelectedIndex(activeIndex)}
             />
@@ -285,13 +411,25 @@ export default function GalleryPage() {
 
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6 sm:p-8">
             <div>
-              <p className="font-serif text-2xl italic text-white">
+              <motion.p
+                key={`caption-${activeIndex}`}
+                variants={fadeUp}
+                initial="hidden"
+                animate="show"
+                className="font-serif text-2xl italic text-white"
+              >
                 A moment to remember
-              </p>
+              </motion.p>
 
-              <p className="mt-2 text-xs text-white/60">
+              <motion.p
+                key={`counter-${activeIndex}`}
+                variants={fadeUp}
+                initial="hidden"
+                animate="show"
+                className="mt-2 text-xs text-white/60"
+              >
                 {activeIndex + 1} / {photos.length}
-              </p>
+              </motion.p>
             </div>
 
             <button
@@ -332,21 +470,46 @@ export default function GalleryPage() {
 
       {/* Polaroid wall */}
       <section className="relative mx-auto max-w-7xl px-5 py-24">
-        <div className="mb-14 text-center">
-          <p className="mb-3 text-xs tracking-[0.35em] text-rose-300/50 uppercase">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="mb-14 text-center"
+        >
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="mb-3 text-xs tracking-[0.35em] text-rose-300/50 uppercase"
+          >
             Scattered moments
-          </p>
+          </motion.p>
 
-          <h2 className="font-serif text-4xl text-rose-100 sm:text-5xl">
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="font-serif text-4xl text-rose-100 sm:text-5xl"
+          >
             Little Pieces of You
-          </h2>
+          </motion.h2>
 
-          <p className="mt-4 text-sm text-rose-100/40">
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="mt-4 text-sm text-rose-100/40"
+          >
             Every picture has its own little place.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+        >
           {photos.map((photo, index) => (
             <motion.button
               key={photo.path}
@@ -361,16 +524,18 @@ export default function GalleryPage() {
                 reduceMotion
                   ? {}
                   : {
-                      scale: 1.06,
+                      scale: 1.08,
                       rotate: 0,
-                      zIndex: 20,
+                      zIndex: 30,
+                      boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.55)",
                     }
               }
+              whileTap={reduceMotion ? {} : { scale: 0.96 }}
               transition={{ duration: reduceMotion ? 0 : 0.35 }}
               style={{
                 rotate: `${((index % 5) - 2) * 2}deg`,
               }}
-              className="group rounded-sm bg-[#f3e8ed] p-2 pb-5 text-left shadow-xl shadow-black/30 sm:p-3 sm:pb-7"
+              className="group rounded-sm bg-[#f3e8ed] p-2 pb-5 text-left shadow-xl shadow-black/30 sm:p-3 sm:pb-7 border border-transparent hover:border-rose-200/40 transition-colors"
             >
               <LazyImage
                 src={photo.url}
@@ -383,7 +548,7 @@ export default function GalleryPage() {
               </p>
             </motion.button>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* 3D-style carousel */}
@@ -459,15 +624,30 @@ export default function GalleryPage() {
       </section>
 
       {/* Closing */}
-      <footer className="relative px-5 py-24 text-center">
-        <p className="font-serif text-3xl italic text-rose-100 sm:text-4xl">
+      <motion.footer
+        variants={fadeUp}
+        initial="hidden"
+        animate="show"
+        className="relative px-5 py-24 text-center"
+      >
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="font-serif text-3xl italic text-rose-100 sm:text-4xl"
+        >
           Some moments deserve to stay.
-        </p>
+        </motion.p>
 
-        <p className="mt-5 text-sm text-rose-100/40">
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="mt-5 text-sm text-rose-100/40"
+        >
           A little collection, made with love. 🥀
-        </p>
-      </footer>
+        </motion.p>
+      </motion.footer>
 
       {/* Full-screen photo viewer */}
       <AnimatePresence>
@@ -513,9 +693,13 @@ export default function GalleryPage() {
               onClick={(event) => event.stopPropagation()}
               className="flex max-h-[85vh] max-w-[85vw] flex-col items-center"
             >
-              <img
+              <motion.img
                 src={selectedPhoto.url}
                 alt={`Selected photograph ${selectedIndex + 1}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
                 className="max-h-[78vh] max-w-full rounded-xl object-contain shadow-2xl"
               />
 
