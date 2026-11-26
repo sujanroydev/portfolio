@@ -42,3 +42,11 @@ export function verifyUnsaidSession(token: string | undefined): boolean {
     received.length === expected.length && timingSafeEqual(received, expected)
   );
 }
+
+export function getUnsaidSessionId(token: string | undefined): string | null {
+  if (!verifyUnsaidSession(token) || !token) return null;
+
+  return createHmac("sha256", process.env.UNSAID_SESSION_SECRET!)
+    .update(token)
+    .digest("hex");
+}

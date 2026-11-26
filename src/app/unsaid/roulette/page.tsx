@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 type Photo = {
   path: string;
@@ -110,6 +111,7 @@ export default function RoulettePage() {
     setDeck(nextDeck.slice(1));
 
     setMessage(messages[Math.floor(Math.random() * messages.length)]);
+    void trackActivity("roulette", "Memory roulette discovered", { photoPath: next.path }, "photo_opened");
   }, [photos, deck, current]);
 
   useEffect(() => {

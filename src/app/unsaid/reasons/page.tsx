@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const reasons = [
   {
@@ -67,6 +68,9 @@ export default function ReasonsPage() {
     setRevealed((current) =>
       current.includes(index) ? current : [...current, index],
     );
+    if (!revealed.includes(index)) {
+      void trackActivity("reasons", "Reason revealed", { reasonIndex: index + 1, title: reasons[index].title }, "item_revealed");
+    }
   };
 
   const revealAll = () => {

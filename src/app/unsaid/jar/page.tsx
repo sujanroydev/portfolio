@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const notes = [
   "Your smile has a way of making ordinary moments feel special. ♡",
@@ -44,6 +45,7 @@ export default function JarPage() {
     setCurrentNote(randomNote);
     setDiscovered((previous) => [...previous, randomNote]);
     setHistory((previous) => [...previous, randomNote]);
+    void trackActivity("jar", "Jar note opened", { noteNumber: discovered.length + 1, note: randomNote }, "item_revealed");
   };
 
   const resetJar = () => {

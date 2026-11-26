@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity, trackResponse } from "@/lib/unsaid/track-activity";
 
 export default function WishPage() {
   const [wish, setWish] = useState("");
@@ -11,6 +12,8 @@ export default function WishPage() {
   function releaseWish() {
     if (!wish.trim()) return;
     setReleased(true);
+    void trackActivity("wish", "Wish released", { characterCount: wish.trim().length }, "activity_completed");
+    void trackResponse("wish", "wish-text", "What is your wish?", wish.trim());
   }
 
   function makeAnotherWish() {

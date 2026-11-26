@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const entries = [
   {
@@ -149,7 +150,10 @@ export default function DiaryPage() {
                 {entries.map((entry, index) => (
                   <button
                     key={entry.date}
-                    onClick={() => setSelectedEntry(entry)}
+                    onClick={() => {
+                      setSelectedEntry(entry);
+                      void trackActivity("diary", "Diary entry opened", { entryTitle: entry.title, entryDate: entry.date }, "item_revealed");
+                    }}
                     className="group w-full border-b border-dashed border-[#b99b83]/40 py-6 text-left transition hover:bg-[#e9d9c8]/40"
                   >
                     <div className="flex items-start gap-5">

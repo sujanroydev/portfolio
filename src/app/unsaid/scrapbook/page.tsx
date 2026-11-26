@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const memories = [
   {
@@ -105,7 +106,10 @@ export default function ScrapbookPage() {
             <button
               key={memory.id}
               type="button"
-              onClick={() => setSelectedMemory(memory)}
+              onClick={() => {
+                setSelectedMemory(memory);
+                void trackActivity("scrapbook", "Scrapbook memory opened", { memoryTitle: memory.title, memoryId: memory.id }, "item_revealed");
+              }}
               className={`group relative mx-auto w-full max-w-sm transition duration-300 hover:z-10 hover:rotate-0 hover:scale-[1.03] ${memory.rotation}`}
             >
               {/* Paper card */}

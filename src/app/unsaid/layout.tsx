@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import PageTracker from "@/components/unsaid/PageTracker";
 
 export const metadata: Metadata = {
   title: "A Little Something For You ❤️",
@@ -21,5 +22,10 @@ interface ForYouLayoutProps {
 }
 
 export default function ForYouLayout({ children }: ForYouLayoutProps) {
-  return children;
+  return (
+    <>
+      <PageTracker />
+      {children}
+    </>
+  );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const stars = [
   {
@@ -75,6 +76,9 @@ export default function UniversePage() {
     setDiscovered((previous) =>
       previous.includes(star.id) ? previous : [...previous, star.id],
     );
+    if (!discovered.includes(star.id)) {
+      void trackActivity("universe", "Universe star discovered", { starId: star.id, message: star.message }, "item_revealed");
+    }
   }
 
   const allDiscovered = discovered.length === stars.length;

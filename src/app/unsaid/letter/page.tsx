@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 export default function LetterPage() {
   const [opened, setOpened] = useState(false);
@@ -38,7 +39,10 @@ export default function LetterPage() {
           <div className="animate-[fadeIn_0.8s_ease] text-center">
             <button
               type="button"
-              onClick={() => setOpened(true)}
+              onClick={() => {
+                setOpened(true);
+                void trackActivity("letter", "Letter opened", { letter: "Words I couldn't say out loud" }, "item_revealed");
+              }}
               aria-label="Open your letter"
               className="group mx-auto block w-full max-w-[440px] text-center focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#ffc1d6]"
             >

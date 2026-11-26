@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const memories = [
   {
@@ -74,7 +75,10 @@ export default function MemoriesPage() {
           {memories.map((memory, index) => (
             <button
               key={memory.title}
-              onClick={() => setSelectedMemory(memory)}
+              onClick={() => {
+                setSelectedMemory(memory);
+                void trackActivity("memories", "Memory opened", { memoryTitle: memory.title, memoryIndex: index + 1 }, "item_revealed");
+              }}
               className="group text-left transition duration-500 hover:-translate-y-3"
               style={{
                 transform: `rotate(${memory.rotation})`,

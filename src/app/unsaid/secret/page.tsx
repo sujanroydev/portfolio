@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const SECRET_CODE = "143";
 
@@ -15,6 +16,7 @@ export default function SecretPage() {
     if (code.trim() === SECRET_CODE) {
       setUnlocked(true);
       setError(false);
+      void trackActivity("secret", "Secret unlocked", {}, "activity_completed");
     } else {
       setError(true);
     }

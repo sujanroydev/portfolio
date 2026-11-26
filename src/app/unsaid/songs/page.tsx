@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const songs = [
   {
@@ -147,7 +148,10 @@ export default function SongsPage() {
 
               <button
                 type="button"
-                onClick={() => setSelectedSong(song)}
+                onClick={() => {
+                  setSelectedSong(song);
+                  void trackActivity("songs", "Song note opened", { songTitle: song.title, artist: song.artist, trackIndex: index + 1 }, "item_revealed");
+                }}
                 aria-label={`Read note about ${song.title}`}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-rose-300 transition hover:border-rose-300 hover:bg-rose-300 hover:text-[#24131c]"
               >

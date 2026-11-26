@@ -8,6 +8,7 @@ import {
   type Variants,
 } from "framer-motion";
 import LazyImage from "@/components/unsaid/LazyImage";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 type Photo = {
   path: string;
@@ -176,6 +177,7 @@ export default function GalleryPage() {
     if (photos.length < 2) return;
 
     setActiveIndex((current) => (current + 1) % photos.length);
+    void trackActivity("gallery", "Next photo selected", { activeIndex: activeIndex + 1 }, "button_clicked");
   };
 
   const previousPhoto = () => {
@@ -368,7 +370,10 @@ export default function GalleryPage() {
                 },
               }}
               className="absolute inset-0 h-full w-full cursor-zoom-in object-cover"
-              onClick={() => setSelectedIndex(activeIndex)}
+              onClick={() => {
+                setSelectedIndex(activeIndex);
+                void trackActivity("gallery", "Photo opened", { photoPath: activePhoto?.path, photoIndex: activeIndex + 1 }, "photo_opened");
+              }}
             />
           </AnimatePresence>
 
@@ -452,7 +457,12 @@ export default function GalleryPage() {
           </button>
 
           <button
-            onClick={() => setIsPlaying((playing) => !playing)}
+            onClick={() => {
+              setIsPlaying((playing) => {
+                void trackActivity("gallery", playing ? "Slideshow paused" : "Slideshow started", { activeIndex: activeIndex + 1 }, playing ? "slideshow_paused" : "slideshow_started");
+                return !playing;
+              });
+            }}
             className="min-w-28 rounded-full border border-rose-100/20 px-5 py-3 text-xs tracking-wider transition hover:bg-rose-100/10"
           >
             {isPlaying ? "Ⅱ Pause" : "▶ Play"}

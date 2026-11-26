@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity, trackResponse } from "@/lib/unsaid/track-activity";
 
 const questions = [
   {
@@ -77,13 +78,22 @@ export default function QuestionsPage() {
       updated[current] = index;
       return updated;
     });
+    void trackActivity("questions", "Answer option selected", { questionId: `question-${current + 1}`, question: questions[current].question, option: questions[current].options[index], optionIndex: index }, "option_selected");
+    void trackResponse("questions", `question-${current + 1}`, questions[current].question, questions[current].options[index]);
   }
 
-  function nextQuestion() {
+  async function nextQuestion() {
     if (selected === undefined) return;
 
     if (current === questions.length - 1) {
       setCompleted(true);
+      const activity = await trackActivity("questions", "Questions activity completed", { answerCount: answers.length }, "activity_completed");
+      const activityId = activity?.activity?.id;
+      for (let index = 0; index < questions.length; index += 1) {
+        const optionIndex = answers[index];
+        if (optionIndex === undefined) continue;
+        void trackResponse("questions", `question-${index + 1}`, questions[index].question, questions[index].options[optionIndex], activityId);
+      }
     } else {
       setCurrent((previous) => previous + 1);
     }

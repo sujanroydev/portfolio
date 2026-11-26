@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity, trackResponse } from "@/lib/unsaid/track-activity";
 
 const questions = [
   {
@@ -69,13 +70,20 @@ export default function IfPage() {
       ...previous,
       [current]: answer,
     }));
+    void trackActivity("if", "What-if option selected", { questionId: `if-${current + 1}`, question: questions[current].question, answer }, "option_selected");
+    void trackResponse("if", `if-${current + 1}`, questions[current].question, answer);
   };
 
-  const nextQuestion = () => {
+  const nextQuestion = async () => {
     if (!answers[current]) return;
 
     if (current === questions.length - 1) {
       setCompleted(true);
+      const activity = await trackActivity("if", "What-if activity completed", { answerCount: Object.keys(answers).length }, "activity_completed");
+      for (let index = 0; index < questions.length; index += 1) {
+        const answer = answers[index];
+        if (answer) void trackResponse("if", `if-${index + 1}`, questions[index].question, answer, activity?.activity?.id);
+      }
     } else {
       setCurrent((previous) => previous + 1);
     }

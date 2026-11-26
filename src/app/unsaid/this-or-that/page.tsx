@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity, trackResponse } from "@/lib/unsaid/track-activity";
 
 const questions = [
   {
@@ -67,9 +68,13 @@ export default function ThisOrThatPage() {
 
   function chooseAnswer(answer: Answer) {
     setAnswers((previous) => [...previous, answer]);
+    const choice = answer === "left" ? question.left : question.right;
+    void trackActivity("this-or-that", "This-or-that choice selected", { questionId: `choice-${current + 1}`, category: question.category, choice: choice.label, side: answer }, "option_selected");
+    void trackResponse("this-or-that", `choice-${current + 1}`, question.category, { choice: choice.label, side: answer });
 
     if (current === questions.length - 1) {
       setFinished(true);
+      void trackActivity("this-or-that", "This-or-that activity completed", { answerCount: answers.length + 1 }, "activity_completed");
     } else {
       setCurrent((previous) => previous + 1);
     }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 type Photo = {
   path: string;
@@ -109,7 +110,12 @@ export default function ConstellationPage() {
     });
 
     setSelected(index);
-  }, []);
+    if (!discovered.has(index)) {
+      void trackActivity("constellation", "Constellation star discovered", { starIndex: index + 1, photoPath: photos[index]?.path }, "item_revealed");
+    } else {
+      void trackActivity("constellation", "Discovered constellation photo opened", { starIndex: index + 1, photoPath: photos[index]?.path }, "photo_opened");
+    }
+  }, [discovered, photos]);
 
   const discoverRandom = useCallback(() => {
     const remaining = photos

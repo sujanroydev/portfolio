@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity, trackResponse } from "@/lib/unsaid/track-activity";
 
 export default function LovePage() {
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
@@ -17,6 +18,7 @@ export default function LovePage() {
 
     setNoPosition({ x, y });
     setNoCount((previous) => previous + 1);
+    void trackActivity("love", "Love question 'No' button selected", { noAttempts: noCount + 1 }, "option_selected");
   };
 
   const messages = [
@@ -72,7 +74,11 @@ export default function LovePage() {
                 {/* YES - stays fixed */}
                 <button
                   type="button"
-                  onClick={() => setAccepted(true)}
+                  onClick={() => {
+                    setAccepted(true);
+                    void trackActivity("love", "Love question answered yes", { answer: "yes" }, "response_submitted");
+                    void trackResponse("love", "love-me", "Do you love me?", "yes");
+                  }}
                   className="relative z-20 rounded-full bg-gradient-to-r from-[#f6b4cb] to-[#e995b5] px-10 py-4 text-base font-bold text-[#401426] shadow-[0_10px_35px_rgba(232,126,166,0.25)] transition duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_15px_45px_rgba(232,126,166,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffc1d6]"
                 >
                   Yes 💗

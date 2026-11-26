@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 const letters = [
   {
@@ -136,7 +137,10 @@ export default function OpenWhenPage() {
             <button
               key={letter.title}
               type="button"
-              onClick={() => setSelectedLetter(letter)}
+              onClick={() => {
+                setSelectedLetter(letter);
+                void trackActivity("open-when", "Open-when letter opened", { letterTitle: letter.title, letterIndex: index + 1 }, "item_revealed");
+              }}
               className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 text-left transition duration-300 hover:-translate-y-1 hover:border-rose-300/40 hover:bg-white/[0.07]"
             >
               <div

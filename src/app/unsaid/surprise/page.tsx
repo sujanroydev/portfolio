@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { trackActivity } from "@/lib/unsaid/track-activity";
 
 export default function SurprisePage() {
   const [opened, setOpened] = useState(false);
@@ -50,7 +51,10 @@ export default function SurprisePage() {
 
             {/* Gift box */}
             <button
-              onClick={() => setOpened(true)}
+              onClick={() => {
+                setOpened(true);
+                void trackActivity("surprise", "Surprise opened", {}, "item_revealed");
+              }}
               aria-label="Open your surprise gift"
               className="group relative mx-auto mt-16 block h-64 w-64 cursor-pointer transition duration-500 hover:-translate-y-3"
             >
