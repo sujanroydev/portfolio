@@ -28,12 +28,12 @@ export const education: Education[] = [
     image: "/assets/images/lpu-logo.jpg",
     alt: "LPU Logo",
   },
-  {
-    school: "Gurucharan University",
-    qualification: "B.Sc Mathematics",
-    image: "/assets/images/gcu-logo.jpg",
-    alt: "Gurucharan University Logo",
-  },
+  // {
+  //   school: "Gurucharan University",
+  //   qualification: "B.Sc Mathematics",
+  //   image: "/assets/images/gcu-logo.jpg",
+  //   alt: "Gurucharan University Logo",
+  // },
   {
     school: "M.A. Senior Secondary School",
     qualification: "Class XI–XII (PCM)",
