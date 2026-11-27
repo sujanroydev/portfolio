@@ -45,6 +45,36 @@ their existing external services. The contact form opens a prefilled email
 using the visitor's default mail application; it does not send data to a
 backend.
 
+## Portfolio email composer
+
+`/mail` sends email through Resend using the verified `sujanroy.in` domain.
+Configure these environment variables before enabling delivery:
+
+```bash
+RESEND_API_KEY=
+EMAIL_DOMAIN=sujanroy.in
+DEFAULT_FROM_EMAIL=hello@sujanroy.in
+EMAIL_ALLOWED_USERNAMES=hello,sujan,contact
+TURNSTILE_SECRET_KEY=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+```
+
+In Resend, add and verify `sujanroy.in` and publish the DNS records Resend
+provides, including DKIM and SPF. `DEFAULT_FROM_EMAIL` must use that domain.
+Only `EMAIL_ALLOWED_USERNAMES` and the default sender can be selected in the
+composer; add a custom local-part to that comma-separated allowlist to enable
+it. Resend must accept the verified domain as the sending identity. A sender
+address is not automatically an inbox: configure a mailbox or alias separately
+if you need to receive replies at it.
+
+Create a Cloudflare Turnstile widget for the portfolio hostname and set its
+site key and secret above. The secret and `RESEND_API_KEY` are server-only. The
+send endpoint also checks the request origin, validates all fields and
+attachments, sanitizes rich-text HTML, and rate-limits attempts per IP in each
+running server process. For multi-instance/serverless production deployments,
+also configure a distributed rate limit at the hosting edge because process
+memory is not shared between instances.
+
 ## Unsaid activity tracking
 
 The private Unsaid experience records page views and meaningful interactions
