@@ -1,4 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import {
+  getMailDashboardPassword,
+  MAIL_SESSION_COOKIE,
+  verifyMailSession,
+} from "@/lib/mail-auth";
+import MailDashboardLogin from "./MailDashboardLogin";
 import MailComposer from "./MailComposer";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +23,18 @@ function isValidUsername(value: string) {
   return USERNAME_PATTERN.test(value) && !value.includes("..");
 }
 
-export default function MailPage() {
+export default async function MailPage() {
+  const dashboardPassword = getMailDashboardPassword();
+  if (!dashboardPassword) {
+    return <MailDashboardLogin configured={false} />;
+  }
+
+  const cookieStore = await cookies();
+  const session = cookieStore.get(MAIL_SESSION_COOKIE)?.value;
+  if (!verifyMailSession(session, dashboardPassword)) {
+    return <MailDashboardLogin configured />;
+  }
+
   const domain = process.env.EMAIL_DOMAIN?.trim().toLowerCase() || "sujanroy.in";
   const configuredDefault = process.env.DEFAULT_FROM_EMAIL?.trim().toLowerCase() ?? "";
   const defaultUsername =
@@ -48,7 +66,6 @@ export default function MailPage() {
       domain={domain}
       defaultUsername={defaultUsername}
       allowedUsernames={allowedUsernames}
-      turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
     />
   );
 }

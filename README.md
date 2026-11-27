@@ -55,9 +55,14 @@ RESEND_API_KEY=
 EMAIL_DOMAIN=sujanroy.in
 DEFAULT_FROM_EMAIL=hello@sujanroy.in
 EMAIL_ALLOWED_USERNAMES=hello,sujan,contact
-TURNSTILE_SECRET_KEY=
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+EMAIL_DASHBOARD_PASSWORD=
 ```
+
+Set `EMAIL_DASHBOARD_PASSWORD` to a unique password with at least 24
+characters. It is server-only; do not prefix it with `NEXT_PUBLIC_` or commit
+it. The `/mail` page requires this password, issues an eight-hour signed,
+HTTP-only session cookie after sign-in, and rate-limits login attempts. No
+external CAPTCHA setup is needed.
 
 In Resend, add and verify `sujanroy.in` and publish the DNS records Resend
 provides, including DKIM and SPF. `DEFAULT_FROM_EMAIL` must use that domain.
@@ -67,13 +72,12 @@ it. Resend must accept the verified domain as the sending identity. A sender
 address is not automatically an inbox: configure a mailbox or alias separately
 if you need to receive replies at it.
 
-Create a Cloudflare Turnstile widget for the portfolio hostname and set its
-site key and secret above. The secret and `RESEND_API_KEY` are server-only. The
-send endpoint also checks the request origin, validates all fields and
-attachments, sanitizes rich-text HTML, and rate-limits attempts per IP in each
-running server process. For multi-instance/serverless production deployments,
-also configure a distributed rate limit at the hosting edge because process
-memory is not shared between instances.
+`RESEND_API_KEY` is server-only. The send endpoint also checks the request
+origin and authenticated session, validates all fields and attachments,
+sanitizes rich-text HTML, and rate-limits attempts per IP in each running
+server process. For multi-instance/serverless production deployments, also
+configure a distributed rate limit at the hosting edge because process memory
+is not shared between instances.
 
 ## Unsaid activity tracking
 

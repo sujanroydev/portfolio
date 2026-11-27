@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import sanitizeHtml from "sanitize-html";
+import {
+  getMailDashboardPassword,
+  getMailClientIp,
+  isMailRateLimited,
+  isSameOrigin,
+  MAIL_SESSION_COOKIE,
+  verifyMailSession,
+} from "@/lib/mail-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,14 +26,12 @@ const RATE_LIMIT_MAX_REQUESTS = 5;
 const USERNAME_PATTERN = /^[a-z0-9](?:[a-z0-9._+-]{0,62}[a-z0-9])?$/;
 const EMAIL_PATTERN =
   /^[^\s@<>(),;:]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 interface MailConfig {
   apiKey: string;
   domain: string;
   defaultUsername: string;
   allowedUsernames: Set<string>;
-  turnstileSecret: string;
 }
 
 function response(message: string, status: number) {
@@ -43,14 +49,8 @@ function getMailConfig(): MailConfig | null {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const domain = process.env.EMAIL_DOMAIN?.trim().toLowerCase();
   const defaultFrom = process.env.DEFAULT_FROM_EMAIL?.trim().toLowerCase();
-  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
 
-  if (
-    !apiKey ||
-    domain !== EMAIL_DOMAIN ||
-    !defaultFrom ||
-    !turnstileSecret
-  ) {
+  if (!apiKey || domain !== EMAIL_DOMAIN || !defaultFrom) {
     return null;
   }
 
@@ -78,40 +78,7 @@ function getMailConfig(): MailConfig | null {
     domain,
     defaultUsername,
     allowedUsernames: new Set([defaultUsername, ...configuredUsernames]),
-    turnstileSecret,
   };
-}
-
-function getClientIp(request: NextRequest) {
-  const realIp = request.headers.get("x-real-ip")?.trim();
-  if (realIp) return realIp.slice(0, 64);
-
-  const forwardedIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return forwardedIp ? forwardedIp.slice(0, 64) : "unknown";
-}
-
-function isRateLimited(ip: string) {
-  const now = Date.now();
-  const current = rateLimitBuckets.get(ip);
-
-  if (!current || current.resetAt <= now) {
-    rateLimitBuckets.set(ip, {
-      count: 1,
-      resetAt: now + RATE_LIMIT_WINDOW_MS,
-    });
-  } else if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return true;
-  } else {
-    current.count += 1;
-  }
-
-  if (rateLimitBuckets.size > 1000) {
-    for (const [key, bucket] of rateLimitBuckets) {
-      if (bucket.resetAt <= now) rateLimitBuckets.delete(key);
-    }
-  }
-
-  return false;
 }
 
 function parseEmailList(value: string, required: boolean) {
@@ -131,38 +98,6 @@ function parseEmailList(value: string, required: boolean) {
   }
 
   return addresses;
-}
-
-async function verifyTurnstile(
-  token: string,
-  secret: string,
-  expectedHostname: string,
-) {
-  const parameters = new URLSearchParams({ secret, response: token });
-  const verification = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      body: parameters,
-      cache: "no-store",
-      signal: AbortSignal.timeout(5000),
-    },
-  );
-
-  if (!verification.ok) {
-    throw new Error(`Turnstile returned HTTP ${verification.status}.`);
-  }
-
-  const result: unknown = await verification.json();
-  return (
-    typeof result === "object" &&
-    result !== null &&
-    "success" in result &&
-    result.success === true &&
-    "hostname" in result &&
-    typeof result.hostname === "string" &&
-    result.hostname.toLowerCase() === expectedHostname.toLowerCase()
-  );
 }
 
 function safePlainText(value: string) {
@@ -195,6 +130,27 @@ const EMAIL_HTML_OPTIONS: sanitizeHtml.IOptions = {
 };
 
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return response("This request is not allowed.", 403);
+  }
+
+  const dashboardPassword = getMailDashboardPassword();
+  if (!dashboardPassword) {
+    return response(
+      "Set a unique EMAIL_DASHBOARD_PASSWORD with at least 24 characters.",
+      503,
+    );
+  }
+
+  if (
+    !verifyMailSession(
+      request.cookies.get(MAIL_SESSION_COOKIE)?.value,
+      dashboardPassword,
+    )
+  ) {
+    return response("Your dashboard session has expired. Sign in again.", 401);
+  }
+
   const config = getMailConfig();
   if (!config) {
     return response(
@@ -203,24 +159,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const origin = request.headers.get("origin");
-  let originUrl: URL;
-  try {
-    if (!origin) return response("This request is not allowed.", 403);
-    originUrl = new URL(origin);
-  } catch {
-    return response("This request is not allowed.", 403);
-  }
-  if (originUrl.origin !== request.nextUrl.origin) {
-    return response("This request is not allowed.", 403);
-  }
-
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (contentLength > MAX_REQUEST_BYTES) {
     return response("The message and attachments are too large.", 413);
   }
 
-  if (isRateLimited(getClientIp(request))) {
+  if (
+    isMailRateLimited(
+      `send:${getMailClientIp(request)}`,
+      RATE_LIMIT_MAX_REQUESTS,
+      RATE_LIMIT_WINDOW_MS,
+    )
+  ) {
     return response("Too many send attempts. Please wait a little before trying again.", 429);
   }
 
@@ -247,7 +197,6 @@ export async function POST(request: NextRequest) {
   const subject = field("subject").trim();
   const text = safePlainText(field("text"));
   const untrustedHtml = field("html");
-  const turnstileToken = field("turnstileToken").trim();
 
   if (!isValidUsername(sender) || !config.allowedUsernames.has(sender)) {
     return response("That sender username is not authorized.", 403);
@@ -276,27 +225,6 @@ export async function POST(request: NextRequest) {
   const html = sanitizeHtml(untrustedHtml, EMAIL_HTML_OPTIONS);
   if (!html.trim()) {
     return response("Enter a message before sending.", 400);
-  }
-
-  if (!turnstileToken) {
-    return response("Complete the bot protection check before sending.", 400);
-  }
-
-  try {
-    const captchaValid = await verifyTurnstile(
-      turnstileToken,
-      config.turnstileSecret,
-      request.nextUrl.hostname,
-    );
-    if (!captchaValid) {
-      return response("Bot verification failed. Please try again.", 403);
-    }
-  } catch (error) {
-    console.error("Turnstile verification failed:", error);
-    return response(
-      "Bot verification is temporarily unavailable. Please try again later.",
-      503,
-    );
   }
 
   const attachmentEntries = formData.getAll("attachments");

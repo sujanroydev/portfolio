@@ -1,11 +1,9 @@
 "use client";
 
-import Script from "next/script";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   createElement,
-  useCallback,
-  useEffect,
   useRef,
   useState,
   type ChangeEvent,
@@ -23,24 +21,6 @@ interface MailComposerProps {
   domain: string;
   defaultUsername: string;
   allowedUsernames: string[];
-  turnstileSiteKey: string;
-}
-
-interface TurnstileOptions {
-  sitekey: string;
-  theme: "auto";
-  callback: (token: string) => void;
-  "expired-callback": () => void;
-  "error-callback": () => void;
-}
-
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (element: HTMLElement, options: TurnstileOptions) => string;
-      remove: (widgetId: string) => void;
-    };
-  }
 }
 
 function isValidUsername(value: string) {
@@ -136,66 +116,12 @@ function renderPreview(html: string) {
   );
 }
 
-interface TurnstileWidgetProps {
-  siteKey: string;
-  resetKey: number;
-  onVerify: (token: string) => void;
-  onError: () => void;
-}
-
-function TurnstileWidget({
-  siteKey,
-  resetKey,
-  onVerify,
-  onError,
-}: TurnstileWidgetProps) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const [scriptReady, setScriptReady] = useState(false);
-
-  useEffect(() => {
-    if (!scriptReady || !elementRef.current || !window.turnstile) return;
-
-    let widgetId: string;
-    try {
-      widgetId = window.turnstile.render(elementRef.current, {
-        sitekey: siteKey,
-        theme: "auto",
-        callback: onVerify,
-        "expired-callback": () => onVerify(""),
-        "error-callback": onError,
-      });
-    } catch {
-      onError();
-      return;
-    }
-
-    return () => window.turnstile?.remove(widgetId);
-  }, [onError, onVerify, resetKey, scriptReady, siteKey]);
-
-  return (
-    <>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        strategy="afterInteractive"
-        onReady={() => setScriptReady(true)}
-        onError={onError}
-      />
-      <div ref={elementRef} aria-label="Bot protection verification" />
-      {!scriptReady && (
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          Loading bot protection…
-        </p>
-      )}
-    </>
-  );
-}
-
 export default function MailComposer({
   domain,
   defaultUsername,
   allowedUsernames,
-  turnstileSiteKey,
 }: MailComposerProps) {
+  const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
   const submissionLock = useRef(false);
   const [sender, setSender] = useState(defaultUsername || "custom");
@@ -210,9 +136,7 @@ export default function MailComposer({
   const [showCopyFields, setShowCopyFields] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [turnstileError, setTurnstileError] = useState(false);
-  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+  const [signingOut, setSigningOut] = useState(false);
   const [feedback, setFeedback] = useState<{
     kind: "success" | "error";
     message: string;
@@ -226,24 +150,12 @@ export default function MailComposer({
   const isAllowedSender = allowedUsernames.includes(username);
   const messageLength = messageText.length;
   const canSend =
-    Boolean(turnstileSiteKey) &&
-    Boolean(turnstileToken) &&
     isAllowedSender &&
     !submitting &&
     Boolean(to.trim()) &&
     Boolean(subject.trim()) &&
     Boolean(messageText.trim()) &&
     messageLength <= MAX_MESSAGE_LENGTH;
-
-  const handleTurnstileVerify = useCallback((token: string) => {
-    setTurnstileToken(token);
-    if (token) setTurnstileError(false);
-  }, []);
-
-  const handleTurnstileError = useCallback(() => {
-    setTurnstileToken("");
-    setTurnstileError(true);
-  }, []);
 
   function updateMessage() {
     setMessageText(editorRef.current?.innerText ?? "");
@@ -318,7 +230,6 @@ export default function MailComposer({
     formData.set("subject", subject);
     formData.set("html", editorHtml);
     formData.set("text", messageText);
-    formData.set("turnstileToken", turnstileToken);
     formData.set("website", "");
     attachments.forEach((file) => formData.append("attachments", file));
 
@@ -337,6 +248,7 @@ export default function MailComposer({
           : "";
 
       if (!response.ok) {
+        if (response.status === 401) router.refresh();
         setFeedback({
           kind: "error",
           message: responseMessage || "The email could not be sent. Please try again.",
@@ -366,8 +278,22 @@ export default function MailComposer({
     } finally {
       submissionLock.current = false;
       setSubmitting(false);
-      setTurnstileToken("");
-      setTurnstileResetKey((key) => key + 1);
+    }
+  }
+
+  async function signOut() {
+    setSigningOut(true);
+
+    try {
+      const response = await fetch("/api/mail/auth", { method: "DELETE" });
+      if (!response.ok) throw new Error("Sign-out request failed.");
+      router.refresh();
+    } catch {
+      setSigningOut(false);
+      setFeedback({
+        kind: "error",
+        message: "Could not sign out. Please try again.",
+      });
     }
   }
 
@@ -385,9 +311,19 @@ export default function MailComposer({
           >
             <span aria-hidden="true">←</span> Back to portfolio
           </Link>
-          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-500 dark:border-white/10 dark:text-slate-400">
-            PRIVATE MAIL COMPOSER
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-500 dark:border-white/10 dark:text-slate-400">
+              SIGNED IN
+            </span>
+            <button
+              type="button"
+              onClick={signOut}
+              disabled={signingOut}
+              className="rounded-lg px-2 py-1 text-sm font-medium text-slate-600 transition hover:text-rose-700 disabled:opacity-50 dark:text-slate-300 dark:hover:text-rose-300"
+            >
+              {signingOut ? "Signing out…" : "Sign out"}
+            </button>
+          </div>
         </header>
 
         <div className="mb-8 max-w-2xl">
@@ -719,27 +655,9 @@ export default function MailComposer({
                 )}
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                <p className="mb-3 text-sm font-medium">Bot protection</p>
-                {turnstileSiteKey ? (
-                  <>
-                    <TurnstileWidget
-                      siteKey={turnstileSiteKey}
-                      resetKey={turnstileResetKey}
-                      onVerify={handleTurnstileVerify}
-                      onError={handleTurnstileError}
-                    />
-                    {turnstileError && (
-                      <p role="alert" className="mt-2 text-xs text-rose-600 dark:text-rose-400">
-                        Verification could not be loaded. Refresh the page and try again.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-amber-700 dark:text-amber-300">
-                    Sending is unavailable until bot protection is configured.
-                  </p>
-                )}
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-400">
+                You are signed in to the private mail dashboard. Your session
+                expires after eight hours.
               </div>
 
               <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
