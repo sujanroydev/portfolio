@@ -6,6 +6,7 @@ import { trackActivity } from "@/lib/unsaid/track-activity";
 
 export default function LetterPage() {
   const [opened, setOpened] = useState(false);
+  const herName = process.env.NEXT_PUBLIC_HER_NAME;
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#160811] px-5 py-16 text-white">
@@ -91,7 +92,7 @@ export default function LetterPage() {
                 </div>
 
                 <h2 className="mb-10 font-serif text-4xl italic text-[#813b57] sm:text-5xl">
-                  Dear Diya,
+                  Dear {herName},
                 </h2>
 
                 <div className="space-y-6 font-serif text-[16px] leading-[2] text-[#684450] sm:text-lg">
